@@ -1,3 +1,5 @@
+import numpy as np
+
 from genetic_algorithm.Image_manager import Image_manager
 from genetic_algorithm.Image_type import Image_type
 from genetic_algorithm.Genetic_algorithm import Genetic_algorithm
@@ -14,8 +16,10 @@ elif number_of_colors == 2:
 else:
     type_image = Image_type.RGB
 
+mocked_array = np.random.randint(256, size=680)
+
 ga_algorithm = Genetic_algorithm(
-    goal = 1000,
+    goal = mocked_array,
     goal_score = 1000,
     max_number_of_children = 10,
     population_limit = 400,

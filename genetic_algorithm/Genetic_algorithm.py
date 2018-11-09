@@ -31,7 +31,7 @@ class Genetic_algorithm(object):
         self.__crossover_chromosoma_probability = crossover_chromosoma_probability
         self.__mutation_probability = mutation_probability
         self.__mutation_chromosoma_probability = mutation_chromosoma_probability
-        self.__strongest_limit = strongest_rate * population_limit
+        self.__strongest_limit = int(strongest_rate * population_limit)
         self.__max_number_of_children = max_number_of_children
         self.__high_boundary_of_pixel = max_pixel_value + 1
 
@@ -41,18 +41,18 @@ class Genetic_algorithm(object):
         self.__recombination()
         is_solved = self.__evaluate()
         while not is_solved:
-            winners = self.__selection()
+            winners = self.__selection_tournament()
             self.__new_population = queue.Queue(self.__crossover(winners))
             self.__mutation()
             self.__recombination()
             is_solved = self.__evaluate()
 
     def __selection_tournament(self):
-        selected_individuals = queue.Queue(random.sample(self.__population[:self.__strongest_limit], self.__tournament_size))
+        selected_individuals = queue.deque(random.sample(self.__population[self.__strongest_limit:], self.__tournament_size))
         winners = queue.Queue()
         while(len(selected_individuals) > 1):
-            individual_A = selected_individuals.get()
-            individual_B = selected_individuals.get()
+            individual_A = selected_individuals.pop()
+            individual_B = selected_individuals.pop()
 
             if(individual_A > individual_B):
                 winners.put(individual_A)
@@ -107,9 +107,9 @@ class Genetic_algorithm(object):
         while not self.__new_population.empty():
             new_individual = self.__new_population.get()
             new_individual.set_score(self.__evaluate_individual(new_individual))
-            self.__population.append(new_individual)
+            self.__population.add(new_individual)
 
-        self.__population = self.__population[self.__population_limit:]
+        self.__population = self.__population[:self.__population_limit]
 
     def __evaluate_individual(self, individual):
         return np.sum(np.abs(np.subtract(individual.get_dna(),self.__goal)))
@@ -119,7 +119,7 @@ class Genetic_algorithm(object):
 
     def __generate_initial_population(self):
         for i in range(self.__population_limit):
-            new_dna = np.random.randint(self.__max_pixel_value, size=self.__image_goal.shape)
+            new_dna = np.random.randint(self.__high_boundary_of_pixel, size=len(self.__goal))
             new_individual = Individual(new_dna)
             self.__new_population.put(new_individual)
 
