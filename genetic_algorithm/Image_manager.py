@@ -11,5 +11,5 @@ class Image_manager(object):
 
 
     def save_image(self,npdata, outfilename):
-        img = Image.fromarray(np.asarray(np.clip(npdata, 0, 255), dtype="uint8"), "L")
+        img = Image.fromarray(np.asarray(np.clip(npdata, 0, 255), dtype="uint8"), "RGB")
         img.save(outfilename)
